@@ -5,6 +5,7 @@ import functools
 import os
 import socket
 import time
+import multiprocessing
 
 from jeepney.auth import SASLParser, make_auth_external, BEGIN, AuthenticationError
 from jeepney.bus import get_bus
@@ -56,12 +57,14 @@ class DBusConnection:
         self.sock.sendall(data)
         return future
 
-    def recv_messages(self, delay=0.01):
+    def recv_messages(self, delay=0.01, stop=multiprocessing.Event()):
         """Read data from the socket and handle incoming messages.
-        
-        Blocks until at least one message has been read.
+
+        Blocks until at least one message has been read or the stop event has
+        been set.
         """
-        while True:
+        stop.clear()
+        while not stop.is_set():
             b = unwrap_read(self.sock.recv(4096))
             msgs = self.parser.feed(b)
             if msgs:
