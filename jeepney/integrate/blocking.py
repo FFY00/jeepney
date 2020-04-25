@@ -4,6 +4,7 @@ from errno import ECONNRESET
 import functools
 import os
 import socket
+import time
 
 from jeepney.auth import SASLParser, make_auth_external, BEGIN, AuthenticationError
 from jeepney.bus import get_bus
@@ -55,7 +56,7 @@ class DBusConnection:
         self.sock.sendall(data)
         return future
 
-    def recv_messages(self):
+    def recv_messages(self, delay=0.01):
         """Read data from the socket and handle incoming messages.
         
         Blocks until at least one message has been read.
@@ -67,6 +68,7 @@ class DBusConnection:
                 for msg in msgs:
                     self.router.incoming(msg)
                 return
+            time.sleep(delay)
 
     def send_and_get_reply(self, message):
         """Send a message, wait for the reply and return it.
