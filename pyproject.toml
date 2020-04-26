@@ -21,3 +21,6 @@ dev = ["testpath"]
 [tool.flit.metadata.urls]
 Documentation = "https://jeepney.readthedocs.io/en/latest/"
 
+[tool.dephell.main]
+from = {format = "poetry", path = "pyproject.toml"}
+to = {format = "setuppy", path = "setup.py"}
