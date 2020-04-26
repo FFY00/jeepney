@@ -1,9 +1,12 @@
 image: python:3.5
 
 before_script:
+  - apt-get update
+  - apt-get install -y dbus-x11
   - pip install pytest testpath
 
 test_job_py35:
   script:
+    - eval $(dbus-launch --sh-syntax)
     - py.test
   stage: test
