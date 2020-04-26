@@ -44,7 +44,6 @@ def test_serialise_dict():
     }
     string_type = simple_types['s']
     sig = Array(DictEntry([string_type, string_type]))
-    print(sig.serialise(data, 0, Endianness.little))
     assert sig.serialise(data, 0, Endianness.little) == (
         b'\x1e\0\0\0' +  # Length
         b'\0\0\0\0' +  # Padding
@@ -56,7 +55,6 @@ def test_serialise_dict():
 
 def test_parse_signature():
     sig = parse_signature(list('(a{sv}(oayays)b)'))
-    print(sig)
     assert sig == Struct([
         Array(DictEntry([simple_types['s'], Variant()])),
         Struct([
