@@ -37,6 +37,7 @@ class _Future:
 
 class DBusConnection:
     def __init__(self, sock):
+        sock.setblocking(0)
         self.sock = sock
         self.parser = Parser()
         self.router = Router(_Future)
@@ -65,13 +66,15 @@ class DBusConnection:
         """
         stop.clear()
         while not stop.is_set():
-            b = unwrap_read(self.sock.recv(4096))
-            msgs = self.parser.feed(b)
-            if msgs:
-                for msg in msgs:
-                    self.router.incoming(msg)
-                return
-            time.sleep(delay)
+            try:
+                b = unwrap_read(self.sock.recv(4096))
+                msgs = self.parser.feed(b)
+                if msgs:
+                    for msg in msgs:
+                        self.router.incoming(msg)
+                    return
+            except BlockingIOError:
+                time.sleep(delay)
 
     def send_and_get_reply(self, message):
         """Send a message, wait for the reply and return it.
