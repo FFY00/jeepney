@@ -1,3 +1,6 @@
+import multiprocessing
+import time
+
 import pytest
 
 from jeepney import DBusAddress
@@ -62,3 +65,17 @@ def test_handle(server):
 
     with pytest.raises(MethodCalledException):
         conn.recv_messages()
+
+
+def test_stop_recv(server):
+    conn, name = server
+
+    stop = multiprocessing.Event()
+    p = multiprocessing.Process(target=conn.recv_messages,
+                                kwargs={'stop': stop})
+    p.start()
+
+    time.sleep(0.3)
+
+    stop.set()
+    p.join()
